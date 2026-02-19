@@ -64,3 +64,30 @@ void run(QueueManager* q){
 }
 
 
+
+QueueManager createQueueManager(){
+    QueueManager q = {0};
+
+    q.elevator.direction = DIRN_STOP;
+    q.story = -1;
+    q.obstructionButton.state = false;
+
+    for(int i = 0; i < 6; i++){
+        q.queue[i] = -1;
+    }
+
+    for(int floor = 0; floor < 4; floor++){
+        q.heispanel.goalButtons[floor].buttonType = BUTTON_CAB;
+        q.heispanel.goalButtons[floor].story = floor;
+        q.heispanel.goalButtons[floor].active = false;
+    }
+
+    q.etasjepanel.callButtons[0] = (CallButton){.buttonType = BUTTON_HALL_UP,   .story = 0, .active = false};
+    q.etasjepanel.callButtons[1] = (CallButton){.buttonType = BUTTON_HALL_UP,   .story = 1, .active = false};
+    q.etasjepanel.callButtons[2] = (CallButton){.buttonType = BUTTON_HALL_DOWN, .story = 1, .active = false};
+    q.etasjepanel.callButtons[3] = (CallButton){.buttonType = BUTTON_HALL_UP,   .story = 2, .active = false};
+    q.etasjepanel.callButtons[4] = (CallButton){.buttonType = BUTTON_HALL_DOWN, .story = 2, .active = false};
+    q.etasjepanel.callButtons[5] = (CallButton){.buttonType = BUTTON_HALL_DOWN, .story = 3, .active = false};
+
+    return q;
+}

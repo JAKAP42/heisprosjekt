@@ -20,6 +20,10 @@ int main(){
 
     elevio_motorDirection(DIRN_UP);
 
+    QueueManager q = createQueueManager();
+
+
+
     while(1){
         int floor = elevio_floorSensor();
 

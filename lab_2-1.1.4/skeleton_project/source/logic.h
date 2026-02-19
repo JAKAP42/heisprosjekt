@@ -27,5 +27,5 @@ void updateStory(QueueManager* q);
 void updateAllSensors(QueueManager* q);
 void updateEverything(QueueManager* q);
 void run(QueueManager* q);
-
+QueueManager createQueueManager();
 
