@@ -20,7 +20,6 @@ int main(){
 
     elevio_motorDirection(DIRN_UP);
 
-    QueueManager q = createQueueManager();
 
 
 

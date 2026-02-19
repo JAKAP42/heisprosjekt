@@ -71,10 +71,9 @@ QueueManager createQueueManager(){
     q.elevator.direction = DIRN_STOP;
     q.story = -1;
     q.obstructionButton.state = false;
+    int temp[6] = {-3,1,2,0,2,1};
+    memcpy(q.queue, temp, sizeof(temp));
 
-    for(int i = 0; i < 6; i++){
-        q.queue[i] = -1;
-    }
 
     for(int floor = 0; floor < 4; floor++){
         q.heispanel.goalButtons[floor].buttonType = BUTTON_CAB;
