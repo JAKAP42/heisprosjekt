@@ -1,14 +1,16 @@
 
 typedef struct {
     ButtonType buttonType;
+    int story;
     bool active;
 } CallButton;
 
 typedef struct {
     ButtonType buttonType;
+    int story;
     bool active;
 } GoalButton;
-void updateCallButton(CallButton* call);
+void updateButton(CallButton* call);
 
 
 

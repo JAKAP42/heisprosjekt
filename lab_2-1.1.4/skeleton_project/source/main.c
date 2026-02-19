@@ -2,11 +2,13 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <time.h>
+#include <stdbool.h>
 #include "driver/elevio.h"
 #include "logic.h"
 #include "sensors.h"
 #include "elevio.h"
 #include "con_load.h"
+
 
 //hallo verden
 
