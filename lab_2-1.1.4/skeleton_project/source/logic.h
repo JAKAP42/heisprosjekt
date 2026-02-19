@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include "sensors.h"
+
 typedef struct{
     //variabler
     int voltage;
@@ -15,7 +16,7 @@ typedef struct {
     Elevator elevator;
     Etasjepanel etasjepanel;
     Heispanel heispanel;
-    Sensor sensors[4];
+    HallEffect sensors[4];
     int queue[6];
     Button obstructionButton;
     int story;

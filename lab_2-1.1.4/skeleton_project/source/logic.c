@@ -1,4 +1,5 @@
 #include "logic.h"
+#include "elevio.h"
 
 //metoder Elevator
 void Elevator_change(Elevator* e,int newVoltage, bool newDirectionUp){
@@ -20,7 +21,11 @@ void updateAllSensors(QueueManager* q){
     for(int i = 0; i<antallHallSensorer; i++){
         hallUpdate(&(q->sensors[i]));
     }
-    updatePanelButtons(&(q->))
-    updateStoryButtons(&(q->))
+    updatePanelButtons(&(q->heispanel));
+    updateStoryButtons(&(q->etasjepanel));
+
 }
 
+void updateStory(QueueManager* q){
+    q->story = elevio_floorSensor;
+}
