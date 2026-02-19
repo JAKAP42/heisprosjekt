@@ -6,13 +6,12 @@
 
 typedef struct{
     //variabler
-    int voltage;
-    bool directionUp;
+    MotorDirection direction;
 
 }Elevator;
 
 //liksomMetoder
-void elevatorChange(Elevator* e,int newVoltage, bool newDirectionUp);
+void elevatorChange(Elevator* e,bool on, bool newDirectionUp);
 
 typedef struct {
     //variabler
