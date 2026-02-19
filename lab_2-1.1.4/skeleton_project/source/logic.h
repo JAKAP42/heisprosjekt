@@ -1,6 +1,8 @@
 #include <stdbool.h>
 #include "sensors.h"
 
+
+
 typedef struct{
     //variabler
     int voltage;
@@ -28,8 +30,3 @@ void updateEverything(QueueManager* q);
 void run(QueueManager* q);
 
 
-typedef struct{
-    bool state;
-}ObstructionButton;
-//liksommetoder
-void updateObstruction(QueueManager* q);

@@ -1,3 +1,5 @@
+#include <stdbool.h>
+#include "logic.h"
 
 typedef struct {
     ButtonType buttonType;
@@ -31,3 +33,10 @@ typedef struct
 } EtasjePanel;
 void updatePanelButtons(EtasjePanel* panel);
 bool checkPanelButton(EtasjePanel* panel, int story, bool directionUp);
+
+
+typedef struct{
+    bool state;
+}ObstructionButton;
+//liksommetoder
+void updateObstruction(QueueManager* q);

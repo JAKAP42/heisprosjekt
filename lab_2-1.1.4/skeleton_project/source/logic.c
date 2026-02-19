@@ -30,8 +30,3 @@ void run(QueueManager* q){
 }
 
 
-
-
-void updateObstruction(QueueManager* q){
-    q->obstructionButtton.
-}
