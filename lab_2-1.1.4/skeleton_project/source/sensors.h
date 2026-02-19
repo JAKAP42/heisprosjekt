@@ -1,3 +1,4 @@
+#pragma once
 #include <stdbool.h>
 #include "logic.h"
 
@@ -13,9 +14,6 @@ typedef struct {
     bool active;
 } GoalButton;
 void updateButton(CallButton* call);
-
-
-
 
 
 typedef struct 
@@ -39,4 +37,4 @@ typedef struct{
     bool state;
 }ObstructionButton;
 //liksommetoder
-void updateObstruction(QueueManager* q);
+void updateObstruction(ObstructionButton* o);
