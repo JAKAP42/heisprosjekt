@@ -4,18 +4,17 @@ typedef struct {
     bool active;
     bool directionUp;
 
-
-    void update();
 } CallButton;
+void callUpdate(CallButton* call);
 
 typedef struct 
 {
     int story;
     bool active;
 
-
-    void update();
 } HallEffect;
+void hallUpdate(HallEffect* hall);
+
 
 typedef struct 
 {
@@ -23,22 +22,23 @@ typedef struct
     bool active;
 
 
-    void update();
 } GoalButton;
+void goalUpdate(GoalButton* goal);
 
 
 typedef struct 
 {
     GoalButton goalButtons[4];
 
-    void updateButtons();
-    bool checkButtons(int story);
 } HeisPanel;
+void updateStoryButtons(HeisPanel* panel);
+bool checkStoryButtons(HeisPanel* panel, int story);
+
 
 typedef struct 
 {
     CallButton callButtons[6];
 
-    void updateButtons();
-    bool checkButtons(int story, bool directionUp);
-} HeisPanel;
+} EtasjePanel;
+void updatePanelButtons(EtasjePanel* panel);
+bool checkPanelButtons(EtasjePanel* panel, int story, bool directionUp);
