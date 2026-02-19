@@ -3,6 +3,9 @@
 #include <signal.h>
 #include <time.h>
 #include "driver/elevio.h"
+#include "logic.h"
+#include "sensors.h"
+
 
 //hallo verden
 
