@@ -8,9 +8,7 @@ typedef struct {
     ButtonType buttonType;
     bool active;
 } GoalButton;
-void updateButton(CallButton* call);
-
-
+void updateCallButton(CallButton* call);
 
 
 
@@ -19,10 +17,9 @@ void updateButton(CallButton* call);
 typedef struct 
 {
     GoalButton goalButtons[4];
-
 } HeisPanel;
 void updateStoryButtons(HeisPanel* panel);
-bool checkStoryButtons(HeisPanel* panel, int story);
+bool checkStoryButton(HeisPanel* panel, int story);
 
 
 typedef struct 
@@ -31,4 +28,4 @@ typedef struct
 
 } EtasjePanel;
 void updatePanelButtons(EtasjePanel* panel);
-bool checkPanelButtons(EtasjePanel* panel, int story, bool directionUp);
+bool checkPanelButton(EtasjePanel* panel, int story, bool directionUp);
