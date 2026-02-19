@@ -22,3 +22,20 @@ void updatePanelButtons(EtasjePanel* panel){
         updateButton(&(panel->callButtons[i]));
     }
 }
+bool checkStoryButton(HeisPanel* panel, int story){
+    for(int i = 0; i < N_FLOORS; i++){
+        if(panel->goalButtons[i].story == story && panel->goalButtons[i].active){
+            return true;
+        }
+    }
+    return false;
+}
+bool checkPanelButton(EtasjePanel* panel, int story, bool directionUp){
+    for(int i = 0; i < N_FLOORS; i++){
+        if(panel->callButtons[i].story == story && panel->callButtons[i].active && panel->callButtons[i].buttonType == (directionUp ? BUTTON_HALL_UP : BUTTON_HALL_DOWN)){
+            return true;
+        }
+    }
+    return false;
+}
+
