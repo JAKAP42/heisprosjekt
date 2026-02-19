@@ -1,32 +1,19 @@
-#pragma once
-
-#include <stdbool.h>
 
 typedef struct {
-    int story;
+    ButtonType buttonType;
     bool active;
-    bool directionUp;
-
 } CallButton;
-void callUpdate(CallButton* call);
 
-typedef struct 
-{
-    int story;
+typedef struct {
+    ButtonType buttonType;
     bool active;
-
-} HallEffect;
-void hallUpdate(HallEffect* hall);
-
-
-typedef struct 
-{
-    int story;
-    bool active;
-
-
 } GoalButton;
-void goalUpdate(GoalButton* goal);
+void updateButton(CallButton* call);
+
+
+
+
+
 
 
 typedef struct 
