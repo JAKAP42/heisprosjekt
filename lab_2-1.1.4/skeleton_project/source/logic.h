@@ -14,13 +14,11 @@ void elevatorChange(Elevator* e,int newVoltage, bool newDirectionUp);
 typedef struct {
     //variabler
     Elevator elevator;
-    Etasjepanel etasjepanel;
-    Heispanel heispanel;
-    HallEffect sensors[4];
+    EtasjePanel etasjepanel;
+    HeisPanel heispanel;
     int queue[6];
-    Button obstructionButton;
     int story;
-
+    ObstructionButton obstructionButton;
 }QueueManager;
 //liksomMetoder
 void updateQueue(QueueManager* q);
@@ -30,3 +28,8 @@ void updateEverything(QueueManager* q);
 void run(QueueManager* q);
 
 
+typedef struct{
+    bool state;
+}ObstructionButton;
+//liksommetoder
+void updateObstruction(QueueManager* q);

@@ -16,16 +16,22 @@ void updateEverything(QueueManager* q){
 }
 
 void updateAllSensors(QueueManager* q){
-    //Bruk alle sensor kall funksjoene her
-    int antallHallSensorer = 4;
-    for(int i = 0; i<antallHallSensorer; i++){
-        hallUpdate(&(q->sensors[i]));
-    }
     updatePanelButtons(&(q->heispanel));
     updateStoryButtons(&(q->etasjepanel));
-
 }
 
 void updateStory(QueueManager* q){
-    q->story = elevio_floorSensor;
+    q->story = elevio_floorSensor();
+}
+
+void run(QueueManager* q){
+    updateEverything(q);
+    //Mer her kanskje
+}
+
+
+
+
+void updateObstruction(QueueManager* q){
+    q->obstructionButtton.
 }
