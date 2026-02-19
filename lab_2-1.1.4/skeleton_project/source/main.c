@@ -5,7 +5,8 @@
 #include "driver/elevio.h"
 #include "logic.h"
 #include "sensors.h"
-
+#include "elevio.h"
+#include "con_load.h"
 
 //hallo verden
 
