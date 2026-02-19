@@ -1,7 +1,8 @@
 #include "sensors.h"
+int N_FLOORS = 4;
 
-updateCallButton(CallButton* call){
-    int active = elevio_callButton(call->buttonType);
+updateButton(CallButton* call){
+    int active = elevio_callButton(call->story, call->buttonType);
     if (active == 1){
         call->active = true;
     } else {
@@ -13,11 +14,28 @@ updateCallButton(CallButton* call){
 
 void updateStoryButtons(HeisPanel* panel){
     for(int i = 0; i < N_FLOORS; i++){
-        int active = elevio_callButton(i, BUTTON_CAB);
-        if (active == 1){
-            panel->goalButtons[i].active = true;
-        } else {
-            panel->goalButtons[i].active = false;
-        }
+        updateButton(&(panel->goalButtons[i]));
     }
 }
+void updatePanelButtons(EtasjePanel* panel){
+    for(int i = 0; i < N_FLOORS; i++){
+        updateButton(&(panel->callButtons[i]));
+    }
+}
+bool checkStoryButton(HeisPanel* panel, int story){
+    for(int i = 0; i < N_FLOORS; i++){
+        if(panel->goalButtons[i].story == story && panel->goalButtons[i].active){
+            return true;
+        }
+    }
+    return false;
+}
+bool checkPanelButton(EtasjePanel* panel, int story, bool directionUp){
+    for(int i = 0; i < N_FLOORS; i++){
+        if(panel->callButtons[i].story == story && panel->callButtons[i].active && panel->callButtons[i].buttonType == (directionUp ? BUTTON_HALL_UP : BUTTON_HALL_DOWN)){
+            return true;
+        }
+    }
+    return false;
+}
+
