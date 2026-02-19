@@ -25,3 +25,20 @@ typedef struct
 
     void update();
 } GoalButton;
+
+
+typedef struct 
+{
+    GoalButton goalButtons[4];
+
+    void updateButtons();
+    bool checkButtons(int story);
+} HeisPanel;
+
+typedef struct 
+{
+    CallButton callButtons[6];
+
+    void updateButtons();
+    bool checkButtons(int story, bool directionUp);
+} HeisPanel;
