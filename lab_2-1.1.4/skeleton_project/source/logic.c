@@ -1,10 +1,17 @@
 #include "logic.h"
 #include "driver/elevio.h"
-#include <stdio.h>   
-#include <string.h>  
+#include <stdio.h>
 
 static int queueSize(const QueueManager* q){
     return (int)(sizeof(q->queue) / sizeof(q->queue[0]));
+}
+
+static void clearQueue(QueueManager* q){
+    int size = queueSize(q);
+    for (int i = 0; i < size; i++)
+    {
+        q->queue[i] = -1;
+    }
 }
 
 static bool queueContains(const QueueManager* q, int floor){
@@ -20,6 +27,11 @@ static bool queueContains(const QueueManager* q, int floor){
 }
 
 static void enqueueIfMissing(QueueManager* q, int floor){
+    if (floor < 0 || floor >= N_FLOORS)
+    {
+        return;
+    }
+
     if (queueContains(q, floor))
     {
         return;
@@ -33,6 +45,143 @@ static void enqueueIfMissing(QueueManager* q, int floor){
             q->queue[i] = floor;
             return;
         }
+    }
+}
+
+static bool hasRequestAtFloor(const QueueManager* q, int floor){
+    if (floor < 0 || floor >= N_FLOORS)
+    {
+        return false;
+    }
+
+    for (int button = 0; button < N_BUTTONS; button++)
+    {
+        if (q->requests[floor][button])
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+static void clearRequestsAtFloor(QueueManager* q, int floor){
+    if (floor < 0 || floor >= N_FLOORS)
+    {
+        return;
+    }
+
+    for (int button = 0; button < N_BUTTONS; button++)
+    {
+        q->requests[floor][button] = false;
+    }
+}
+
+static void latchRequestsFromButtons(QueueManager* q){
+    for (int floor = 0; floor < N_FLOORS; floor++)
+    {
+        if (checkStoryButton(&(q->heispanel), floor))
+        {
+            q->requests[floor][BUTTON_CAB] = true;
+        }
+    }
+
+    for (int floor = 0; floor < N_FLOORS - 1; floor++)
+    {
+        if (checkPanelButton(&(q->etasjepanel), floor, true))
+        {
+            q->requests[floor][BUTTON_HALL_UP] = true;
+        }
+    }
+
+    for (int floor = 1; floor < N_FLOORS; floor++)
+    {
+        if (checkPanelButton(&(q->etasjepanel), floor, false))
+        {
+            q->requests[floor][BUTTON_HALL_DOWN] = true;
+        }
+    }
+}
+
+static void buildScanUp(QueueManager* q){
+    for (int floor = q->story; floor < N_FLOORS; floor++)
+    {
+        if (hasRequestAtFloor(q, floor))
+        {
+            enqueueIfMissing(q, floor);
+        }
+    }
+
+    for (int floor = q->story - 1; floor >= 0; floor--)
+    {
+        if (hasRequestAtFloor(q, floor))
+        {
+            enqueueIfMissing(q, floor);
+        }
+    }
+}
+
+static void buildScanDown(QueueManager* q){
+    for (int floor = q->story; floor >= 0; floor--)
+    {
+        if (hasRequestAtFloor(q, floor))
+        {
+            enqueueIfMissing(q, floor);
+        }
+    }
+
+    for (int floor = q->story + 1; floor < N_FLOORS; floor++)
+    {
+        if (hasRequestAtFloor(q, floor))
+        {
+            enqueueIfMissing(q, floor);
+        }
+    }
+}
+
+static void buildScanIdle(QueueManager* q){
+    int nearestUp = -1;
+    int nearestDown = -1;
+
+    for (int floor = q->story; floor < N_FLOORS; floor++)
+    {
+        if (hasRequestAtFloor(q, floor))
+        {
+            nearestUp = floor;
+            break;
+        }
+    }
+
+    for (int floor = q->story; floor >= 0; floor--)
+    {
+        if (hasRequestAtFloor(q, floor))
+        {
+            nearestDown = floor;
+            break;
+        }
+    }
+
+    if (nearestUp == -1 && nearestDown == -1)
+    {
+        return;
+    }
+    if (nearestDown == -1)
+    {
+        buildScanUp(q);
+        return;
+    }
+    if (nearestUp == -1)
+    {
+        buildScanDown(q);
+        return;
+    }
+
+    if ((nearestUp - q->story) <= (q->story - nearestDown))
+    {
+        buildScanUp(q);
+    }
+    else
+    {
+        buildScanDown(q);
     }
 }
 
@@ -79,6 +228,18 @@ void updateStory(QueueManager* q){
 
 void run(QueueManager* q){
     updateEverything(q);
+
+    // Startup: continue moving until we have a known floor.
+    if (q->story < 0)
+    {
+        if (q->elevator.direction == DIRN_STOP)
+        {
+            elevatorChange(&(q->elevator), true, true);
+        }
+        return;
+    }
+
+    int size = queueSize(q);
     int target = q->queue[0];
     if (target != -1)
     {
@@ -90,15 +251,17 @@ void run(QueueManager* q){
         {
             elevatorChange(&(q->elevator), true, false);
         }
-        else if (target == q->story)
+        else
         {
             elevatorChange(&(q->elevator), false, true);
-            for (int i = 0; i < 5; i++)
+            clearRequestsAtFloor(q, target);
+
+            for (int i = 0; i < size - 1; i++)
             {
                 q->queue[i] = q->queue[i+1];
             }
-            q->queue[5] = -1;
-        } 
+            q->queue[size - 1] = -1;
+        }
     }
     else
     {
@@ -108,27 +271,28 @@ void run(QueueManager* q){
 }
 
 void updateQueue(QueueManager* q){
-    for (int floor = 0; floor < N_FLOORS; floor++)
+    // Latch aktive knapper til intern request-tilstand.
+    latchRequestsFromButtons(q);
+
+    // Ikke rebuild når etasje er ukjent (startup mellom etasjer).
+    if (q->story < 0)
     {
-        if (checkStoryButton(&(q->heispanel), floor))
-        {
-            enqueueIfMissing(q, floor);
-        }
+        return;
     }
 
-    for (int floor = 0; floor < N_FLOORS; floor++)
-    {
-        bool upValid = floor < (N_FLOORS - 1);
-        bool downValid = floor > 0;
+    clearQueue(q);
 
-        if (upValid && checkPanelButton(&(q->etasjepanel), floor, true))
-        {
-            enqueueIfMissing(q, floor);
-        }
-        if (downValid && checkPanelButton(&(q->etasjepanel), floor, false))
-        {
-            enqueueIfMissing(q, floor);
-        }
+    if (q->elevator.direction == DIRN_UP)
+    {
+        buildScanUp(q);
+    }
+    else if (q->elevator.direction == DIRN_DOWN)
+    {
+        buildScanDown(q);
+    }
+    else
+    {
+        buildScanIdle(q);
     }
 }
 
@@ -138,9 +302,7 @@ QueueManager createQueueManager(){
     q.elevator.direction = DIRN_STOP;
     q.story = -1;
     q.obstructionButton.state = false;
-    int temp[6] = {-1,-1,-1,-1,-1,-1};
-    memcpy(q.queue, temp, sizeof(temp));
-
+    clearQueue(&q);
 
     for(int floor = 0; floor < 4; floor++){
         q.heispanel.goalButtons[floor].buttonType = BUTTON_CAB;

@@ -18,6 +18,7 @@ typedef struct {
     Elevator elevator;
     EtasjePanel etasjepanel;
     HeisPanel heispanel;
+    bool requests[N_FLOORS][N_BUTTONS];
     int queue[6];
     int story;
     ObstructionButton obstructionButton;
