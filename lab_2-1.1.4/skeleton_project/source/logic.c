@@ -37,6 +37,11 @@ void updateAllSensors(QueueManager* q){
 
 void updateStory(QueueManager* q){
     q->story = elevio_floorSensor();
+    // floor indicator is just a lamp on the panel; the simulator
+    // doesn't know the current floor unless we tell it explicitly.
+    if(q->story >= 0 && q->story < N_FLOORS) {
+        elevio_floorIndicator(q->story);
+    }
 }
 
 void run(QueueManager* q){
@@ -76,7 +81,7 @@ QueueManager createQueueManager(){
     q.elevator.direction = DIRN_STOP;
     q.story = -1;
     q.obstructionButton.state = false;
-    int temp[6] = {-3,1,2,0,2,1};
+    int temp[6] = {2,1,2,0,2,1};
     memcpy(q.queue, temp, sizeof(temp));
 
 
