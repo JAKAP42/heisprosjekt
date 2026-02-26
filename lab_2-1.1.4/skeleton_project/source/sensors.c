@@ -1,11 +1,4 @@
 #include "sensors.h"
-<<<<<<< HEAD
-#include "logic.h"
-#include "elevio.h"
-
-int N_FLOORS = 4;
-=======
->>>>>>> c5caf52fa40754579a450b4d517f57a4637fd65a
 
 // use N_FLOORS macro from elevio.h instead of separate variable
 
