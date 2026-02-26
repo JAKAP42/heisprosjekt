@@ -66,8 +66,28 @@ void run(QueueManager* q){
 }
 
 // stub for updateQueue; actual queue behavior not implemented yet
+//checkPanelButton sjekker om knapp er på
+//checkStorybutton sjekker om knapp er på
 void updateQueue(QueueManager* q){
-    (void)q;
+    //q->queue starter som en array slik {-1,-1,-1,-1,-1,-1}. -1 betegner ingen etasje er satt da står d stille.
+    //heisen er 0 indeksert med 4 etasjer.
+    for (int i = 0; i<3; i++){
+        if(checkStoryButton(&q->heispanel,i)){
+            //logikk for å putte inn etasjeforespørselen
+        }
+    }
+
+    for(int i = 0; i<3;i++){ //sjekker opp knappene
+        if(checkPanelButton(&q->etasjepanel,i,true)){
+            //logikk for å plassere den relevante forespørselen i køen
+        }
+    }
+    for(int i = 1; i<4;i++){ //sjekker ned knappene
+        if(checkPanelButton(&q->etasjepanel,i,false)){
+            //logikk for å plassere den relevante forespørselen i køen
+        }
+    }
+    q->queue
 }
 
 QueueManager createQueueManager(){
