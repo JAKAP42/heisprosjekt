@@ -1,6 +1,8 @@
 #pragma once
 #include <stdbool.h>
-#include "logic.h"
+#include "driver/elevio.h"  // ButtonType
+
+// removed include of logic.h to avoid circular dependency
 
 typedef struct {
     ButtonType buttonType;

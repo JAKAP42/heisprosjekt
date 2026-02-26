@@ -1,8 +1,9 @@
 #include "logic.h"
-#include "elevio.h"
+#include "driver/elevio.h"
+#include <string.h>  // for memcpy
 
 //metoder Elevator
-void elevator_change(Elevator* e,bool on, bool newDirectionUp){
+void elevatorChange(Elevator* e,bool on, bool newDirectionUp){
     if (on)
     {
         if (newDirectionUp)
@@ -29,8 +30,9 @@ void updateEverything(QueueManager* q){
 }
 
 void updateAllSensors(QueueManager* q){
-    updatePanelButtons(&(q->heispanel));
-    updateStoryButtons(&(q->etasjepanel));
+    // heispanel holds goal buttons, etasjepanel holds call buttons
+    updateStoryButtons(&(q->heispanel));
+    updatePanelButtons(&(q->etasjepanel));
 }
 
 void updateStory(QueueManager* q){
@@ -44,26 +46,29 @@ void run(QueueManager* q){
     {
         if (target > q->story)
         {
-            elevator_change(&(q->elevator), true, true);
+            elevatorChange(&(q->elevator), true, true);
         }
         else if (target < q->story)
         {
-            elevator_change(&(q->elevator), true, false);
+            elevatorChange(&(q->elevator), true, false);
         }
         else
         {
-            elevator_change(&(q->elevator), false, true);
+            elevatorChange(&(q->elevator), false, true);
         }
         
     }
     else
     {
-        elevator_change(&(q->elevator), false, true);
+        elevatorChange(&(q->elevator), false, true);
     }
     //Mer her kanskje
 }
 
-
+// stub for updateQueue; actual queue behavior not implemented yet
+void updateQueue(QueueManager* q){
+    (void)q;
+}
 
 QueueManager createQueueManager(){
     QueueManager q = {0};

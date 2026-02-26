@@ -1,7 +1,7 @@
 #pragma once
 #include <stdbool.h>
+#include "driver/elevio.h"  // for MotorDirection
 #include "sensors.h"
-
 
 
 typedef struct{
