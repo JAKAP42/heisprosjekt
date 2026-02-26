@@ -1,6 +1,7 @@
 #include "logic.h"
 #include "driver/elevio.h"
-#include <string.h>  // for memcpy
+#include <stdio.h>   
+#include <string.h>  
 
 //metoder Elevator
 void elevatorChange(Elevator* e,bool on, bool newDirectionUp){
@@ -36,7 +37,11 @@ void updateAllSensors(QueueManager* q){
 }
 
 void updateStory(QueueManager* q){
-    q->story = elevio_floorSensor();
+    int sensor = elevio_floorSensor();
+    if (sensor >= 0 && sensor < N_FLOORS) {
+        q->story = sensor;
+        elevio_floorIndicator(sensor);
+    }
 }
 
 void run(QueueManager* q){
@@ -52,11 +57,15 @@ void run(QueueManager* q){
         {
             elevatorChange(&(q->elevator), true, false);
         }
-        else
+        else if (target == q->story)
         {
             elevatorChange(&(q->elevator), false, true);
-        }
-        
+            for (int i = 0; i < 5; i++)
+            {
+                q->queue[i] = q->queue[i+1];
+            }
+            q->queue[5] = -1;
+        } 
     }
     else
     {
@@ -66,8 +75,6 @@ void run(QueueManager* q){
 }
 
 // stub for updateQueue; actual queue behavior not implemented yet
-//checkPanelButton sjekker om knapp er på
-//checkStorybutton sjekker om knapp er på
 void updateQueue(QueueManager* q){
     //q->queue starter som en array slik {-1,-1,-1,-1,-1,-1}. -1 betegner ingen etasje er satt da står d stille.
     //heisen er 0 indeksert med 4 etasjer.
@@ -96,7 +103,7 @@ QueueManager createQueueManager(){
     q.elevator.direction = DIRN_STOP;
     q.story = -1;
     q.obstructionButton.state = false;
-    int temp[6] = {-3,1,2,0,2,1};
+    int temp[6] = {2,1,3,0,2,1};
     memcpy(q.queue, temp, sizeof(temp));
 
 
