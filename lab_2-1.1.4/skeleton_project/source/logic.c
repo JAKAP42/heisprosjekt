@@ -3,6 +3,39 @@
 #include <stdio.h>   
 #include <string.h>  
 
+static int queueSize(const QueueManager* q){
+    return (int)(sizeof(q->queue) / sizeof(q->queue[0]));
+}
+
+static bool queueContains(const QueueManager* q, int floor){
+    int size = queueSize(q);
+    for (int i = 0; i < size; i++)
+    {
+        if (q->queue[i] == floor)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+static void enqueueIfMissing(QueueManager* q, int floor){
+    if (queueContains(q, floor))
+    {
+        return;
+    }
+
+    int size = queueSize(q);
+    for (int i = 0; i < size; i++)
+    {
+        if (q->queue[i] == -1)
+        {
+            q->queue[i] = floor;
+            return;
+        }
+    }
+}
+
 //metoder Elevator
 void elevatorChange(Elevator* e,bool on, bool newDirectionUp){
     if (on)
@@ -25,9 +58,9 @@ void elevatorChange(Elevator* e,bool on, bool newDirectionUp){
 
 //liksomMetoder Queue manager
 void updateEverything(QueueManager* q){
-    updateQueue(q);
     updateAllSensors(q);
     updateStory(q);
+    updateQueue(q);
 }
 
 void updateAllSensors(QueueManager* q){
@@ -74,27 +107,29 @@ void run(QueueManager* q){
     //Mer her kanskje
 }
 
-// stub for updateQueue; actual queue behavior not implemented yet
 void updateQueue(QueueManager* q){
-    //q->queue starter som en array slik {-1,-1,-1,-1,-1,-1}. -1 betegner ingen etasje er satt da står d stille.
-    //heisen er 0 indeksert med 4 etasjer.
-    for (int i = 0; i<3; i++){
-        if(checkStoryButton(&q->heispanel,i)){
-            //logikk for å putte inn etasjeforespørselen
+    for (int floor = 0; floor < N_FLOORS; floor++)
+    {
+        if (checkStoryButton(&(q->heispanel), floor))
+        {
+            enqueueIfMissing(q, floor);
         }
     }
 
-    for(int i = 0; i<3;i++){ //sjekker opp knappene
-        if(checkPanelButton(&q->etasjepanel,i,true)){
-            //logikk for å plassere den relevante forespørselen i køen
+    for (int floor = 0; floor < N_FLOORS; floor++)
+    {
+        bool upValid = floor < (N_FLOORS - 1);
+        bool downValid = floor > 0;
+
+        if (upValid && checkPanelButton(&(q->etasjepanel), floor, true))
+        {
+            enqueueIfMissing(q, floor);
+        }
+        if (downValid && checkPanelButton(&(q->etasjepanel), floor, false))
+        {
+            enqueueIfMissing(q, floor);
         }
     }
-    for(int i = 1; i<4;i++){ //sjekker ned knappene
-        if(checkPanelButton(&q->etasjepanel,i,false)){
-            //logikk for å plassere den relevante forespørselen i køen
-        }
-    }
-    q->queue;
 }
 
 QueueManager createQueueManager(){
@@ -103,7 +138,7 @@ QueueManager createQueueManager(){
     q.elevator.direction = DIRN_STOP;
     q.story = -1;
     q.obstructionButton.state = false;
-    int temp[6] = {2,1,3,0,2,1};
+    int temp[6] = {-1,-1,-1,-1,-1,-1};
     memcpy(q.queue, temp, sizeof(temp));
 
 

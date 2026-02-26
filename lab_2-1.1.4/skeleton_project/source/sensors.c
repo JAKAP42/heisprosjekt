@@ -20,7 +20,8 @@ void updateStoryButtons(HeisPanel* panel){
     }
 }
 void updatePanelButtons(EtasjePanel* panel){
-    for(int i = 0; i < N_FLOORS; i++){
+    int count = (int)(sizeof(panel->callButtons) / sizeof(panel->callButtons[0]));
+    for(int i = 0; i < count; i++){
         updateButton(&(panel->callButtons[i]));
     }
 }
@@ -33,7 +34,8 @@ bool checkStoryButton(HeisPanel* panel, int story){
     return false;
 }
 bool checkPanelButton(EtasjePanel* panel, int story, bool directionUp){
-    for(int i = 0; i < N_FLOORS; i++){
+    int count = (int)(sizeof(panel->callButtons) / sizeof(panel->callButtons[0]));
+    for(int i = 0; i < count; i++){
         if(panel->callButtons[i].story == story && panel->callButtons[i].active && panel->callButtons[i].buttonType == (directionUp ? BUTTON_HALL_UP : BUTTON_HALL_DOWN)){
             return true;
         }
