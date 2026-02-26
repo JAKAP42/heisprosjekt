@@ -1,4 +1,7 @@
 #include "sensors.h"
+#include "logic.h"
+#include "elevio.h"
+
 int N_FLOORS = 4;
 
 updateButton(CallButton* call){
