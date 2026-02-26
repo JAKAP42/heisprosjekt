@@ -94,7 +94,7 @@ void updateQueue(QueueManager* q){
             //logikk for å plassere den relevante forespørselen i køen
         }
     }
-    q->queue
+    q->queue;
 }
 
 QueueManager createQueueManager(){
