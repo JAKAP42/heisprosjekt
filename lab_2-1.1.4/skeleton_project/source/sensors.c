@@ -1,10 +1,15 @@
 #include "sensors.h"
+<<<<<<< HEAD
 #include "logic.h"
 #include "elevio.h"
 
 int N_FLOORS = 4;
+=======
+>>>>>>> c5caf52fa40754579a450b4d517f57a4637fd65a
 
-updateButton(CallButton* call){
+// use N_FLOORS macro from elevio.h instead of separate variable
+
+void updateButton(CallButton* call){
     int active = elevio_callButton(call->story, call->buttonType);
     if (active == 1){
         call->active = true;
@@ -17,7 +22,8 @@ updateButton(CallButton* call){
 
 void updateStoryButtons(HeisPanel* panel){
     for(int i = 0; i < N_FLOORS; i++){
-        updateButton(&(panel->goalButtons[i]));
+        // goalButtons and callButtons share the same layout; cast to reuse updateButton
+        updateButton((CallButton*)&(panel->goalButtons[i]));
     }
 }
 void updatePanelButtons(EtasjePanel* panel){

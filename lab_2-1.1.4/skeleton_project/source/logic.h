@@ -1,7 +1,7 @@
 #pragma once
 #include <stdbool.h>
+#include "driver/elevio.h"  // for MotorDirection
 #include "sensors.h"
-
 
 
 typedef struct{
@@ -28,5 +28,5 @@ void updateStory(QueueManager* q);
 void updateAllSensors(QueueManager* q);
 void updateEverything(QueueManager* q);
 void run(QueueManager* q);
-
+QueueManager createQueueManager();
 

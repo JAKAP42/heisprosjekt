@@ -1,8 +1,9 @@
 #include "logic.h"
-#include "elevio.h"
+#include "driver/elevio.h"
+#include <string.h>  // for memcpy
 
 //metoder Elevator
-void elevator_change(Elevator* e,bool on, bool newDirectionUp){
+void elevatorChange(Elevator* e,bool on, bool newDirectionUp){
     if (on)
     {
         if (newDirectionUp)
@@ -29,8 +30,9 @@ void updateEverything(QueueManager* q){
 }
 
 void updateAllSensors(QueueManager* q){
-    updatePanelButtons(&(q->heispanel));
-    updateStoryButtons(&(q->etasjepanel));
+    // heispanel holds goal buttons, etasjepanel holds call buttons
+    updateStoryButtons(&(q->heispanel));
+    updatePanelButtons(&(q->etasjepanel));
 }
 
 void updateStory(QueueManager* q){
@@ -44,23 +46,52 @@ void run(QueueManager* q){
     {
         if (target > q->story)
         {
-            elevator_change(&(q->elevator), true, true);
+            elevatorChange(&(q->elevator), true, true);
         }
         else if (target < q->story)
         {
-            elevator_change(&(q->elevator), true, false);
+            elevatorChange(&(q->elevator), true, false);
         }
         else
         {
-            elevator_change(&(q->elevator), false, true);
+            elevatorChange(&(q->elevator), false, true);
         }
         
     }
     else
     {
-        elevator_change(&(q->elevator), false, true);
+        elevatorChange(&(q->elevator), false, true);
     }
     //Mer her kanskje
 }
 
+// stub for updateQueue; actual queue behavior not implemented yet
+void updateQueue(QueueManager* q){
+    (void)q;
+}
 
+QueueManager createQueueManager(){
+    QueueManager q = {0};
+
+    q.elevator.direction = DIRN_STOP;
+    q.story = -1;
+    q.obstructionButton.state = false;
+    int temp[6] = {-3,1,2,0,2,1};
+    memcpy(q.queue, temp, sizeof(temp));
+
+
+    for(int floor = 0; floor < 4; floor++){
+        q.heispanel.goalButtons[floor].buttonType = BUTTON_CAB;
+        q.heispanel.goalButtons[floor].story = floor;
+        q.heispanel.goalButtons[floor].active = false;
+    }
+
+    q.etasjepanel.callButtons[0] = (CallButton){.buttonType = BUTTON_HALL_UP,   .story = 0, .active = false};
+    q.etasjepanel.callButtons[1] = (CallButton){.buttonType = BUTTON_HALL_UP,   .story = 1, .active = false};
+    q.etasjepanel.callButtons[2] = (CallButton){.buttonType = BUTTON_HALL_DOWN, .story = 1, .active = false};
+    q.etasjepanel.callButtons[3] = (CallButton){.buttonType = BUTTON_HALL_UP,   .story = 2, .active = false};
+    q.etasjepanel.callButtons[4] = (CallButton){.buttonType = BUTTON_HALL_DOWN, .story = 2, .active = false};
+    q.etasjepanel.callButtons[5] = (CallButton){.buttonType = BUTTON_HALL_DOWN, .story = 3, .active = false};
+
+    return q;
+}
