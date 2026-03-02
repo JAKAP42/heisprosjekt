@@ -18,15 +18,21 @@ typedef struct {
     Elevator elevator;
     EtasjePanel etasjepanel;
     HeisPanel heispanel;
-    int queue[6];
+    int queue[4];
     int story;
+    int upQueue[3];
+    int downQueue[3];
+    bool queueDirUp;
     ObstructionButton obstructionButton;
 }QueueManager;
+
 //liksomMetoder
 void updateQueue(QueueManager* q);
 void updateStory(QueueManager* q);
 void updateAllSensors(QueueManager* q);
 void updateEverything(QueueManager* q);
+void placeOrderInQueue(QueueManager* q, int story, bool directionUp);
+void decideDirection(QueueManager* q);
 void run(QueueManager* q);
 QueueManager createQueueManager();
 

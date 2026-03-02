@@ -49,23 +49,27 @@ void run(QueueManager* q){
     int target = q->queue[0];
     if (target != -1)
     {
-        if (target > q->story)
-        {
-            elevatorChange(&(q->elevator), true, true);
-        }
-        else if (target < q->story)
-        {
-            elevatorChange(&(q->elevator), true, false);
-        }
-        else if (target == q->story)
+        if (target == q->story)
         {
             elevatorChange(&(q->elevator), false, true);
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 3; i++)
             {
                 q->queue[i] = q->queue[i+1];
             }
-            q->queue[5] = -1;
-        } 
+            q->queue[3] = -1;
+        }
+        else
+        {
+            /* obey the current scheduling direction; ignore target relative position */
+            if (q->queueDirUp)
+            {
+                elevatorChange(&(q->elevator), true, true);
+            }
+            else
+            {
+                elevatorChange(&(q->elevator), true, false);
+            }
+        }
     }
     else
     {
@@ -73,6 +77,81 @@ void run(QueueManager* q){
     }
     //Mer her kanskje
 }
+void decideDirection(QueueManager* q){
+    if (q->queueDirUp)
+    {
+        /* determine if there are any requests above current floor */
+        bool requestAbove = false;
+        for (int i = 0; i < 3 && !requestAbove; ++i) {
+            if (q->upQueue[i] > q->story || q->downQueue[i] > q->story) {
+                requestAbove = true;
+            }
+        }
+        
+        /* only turn around when there are no further requests above or we're at the top */
+        if (!requestAbove || q->story >= N_FLOORS - 1) {
+            q->queueDirUp = false;
+        }
+    }
+    else
+    {
+        /* determine if there are any requests below current floor */
+        bool requestBelow = false;
+        for (int i = 0; i < 3 && !requestBelow; ++i) {
+            if ((q->upQueue[i] != -1 && q->upQueue[i] < q->story) ||
+                (q->downQueue[i] != -1 && q->downQueue[i] < q->story)) {
+                requestBelow = true;
+            }
+        }
+        
+        /* only switch back up when no requests remain below or we're at bottom */
+        if (!requestBelow || q->story <= 0) {
+            q->queueDirUp = true;
+        }
+    }
+} 
+
+
+
+void placeOrderInQueue(QueueManager* q, int story, bool directionUp){
+    //logikk for å plassere den relevante forespørselen i køen
+    if (directionUp)
+    {
+        // don't add if already present
+        for (int i = 0; i < 3; ++i) {
+            if (q->upQueue[i] == story) {
+                return; /* already queued */
+            }
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            if (q->upQueue[i] == -1)
+            {
+                q->upQueue[i] = story;
+                break;
+            }
+        }
+    }
+    else
+    {
+        // avoid duplicates in down queue as well
+        for (int i = 0; i < 3; ++i) {
+            if (q->downQueue[i] == story) {
+                return;
+            }
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            if (q->downQueue[i] == -1)
+            {
+                q->downQueue[i] = story;
+                break;
+            }
+        }
+    }
+
+}
+
 
 // stub for updateQueue; actual queue behavior not implemented yet
 void updateQueue(QueueManager* q){
@@ -80,21 +159,73 @@ void updateQueue(QueueManager* q){
     //heisen er 0 indeksert med 4 etasjer.
     for (int i = 0; i<3; i++){
         if(checkStoryButton(&q->heispanel,i)){
-            //logikk for å putte inn etasjeforespørselen
+            if (q->story < i)
+            {
+                //logikk for å plassere den relevante forespørselen i opp køen
+                placeOrderInQueue(q, i, true);
+            }
+            else if (q->story > i)
+            {
+                //logikk for å plassere den relevante forespørselen i ned køen
+                placeOrderInQueue(q, i, false);
+            }
         }
     }
 
     for(int i = 0; i<3;i++){ //sjekker opp knappene
         if(checkPanelButton(&q->etasjepanel,i,true)){
             //logikk for å plassere den relevante forespørselen i køen
+            placeOrderInQueue(q, i, true);
         }
     }
     for(int i = 1; i<4;i++){ //sjekker ned knappene
         if(checkPanelButton(&q->etasjepanel,i,false)){
             //logikk for å plassere den relevante forespørselen i køen
+            placeOrderInQueue(q, i, false);
         }
     }
-    q->queue;
+    
+    /* decide direction before assigning next target */
+    decideDirection(q);
+    
+    /* copy all items from the active direction queue into the main queue */
+    if (q->queueDirUp)
+    {
+        /* sort upQueue in ascending order */
+        for (int i = 0; i < 3; ++i) {
+            q->queue[i] = q->upQueue[i];
+        }
+        /* bubble sort ascending */
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 2; ++j) {
+                if (q->queue[j] != -1 && q->queue[j+1] != -1 && q->queue[j] > q->queue[j+1]) {
+                    int temp = q->queue[j];
+                    q->queue[j] = q->queue[j+1];
+                    q->queue[j+1] = temp;
+                }
+            }
+        }
+        q->queue[3] = -1;
+    }
+    else
+    {
+        /* sort downQueue in descending order */
+        for (int i = 0; i < 3; ++i) {
+            q->queue[i] = q->downQueue[i];
+        }
+        /* bubble sort descending */
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 2; ++j) {
+                if (q->queue[j] != -1 && q->queue[j+1] != -1 && q->queue[j] < q->queue[j+1]) {
+                    int temp = q->queue[j];
+                    q->queue[j] = q->queue[j+1];
+                    q->queue[j+1] = temp;
+                }
+            }
+        }
+        q->queue[3] = -1;
+    }
+    
 }
 
 QueueManager createQueueManager(){
@@ -103,9 +234,16 @@ QueueManager createQueueManager(){
     q.elevator.direction = DIRN_STOP;
     q.story = -1;
     q.obstructionButton.state = false;
-    int temp[6] = {2,1,3,0,2,1};
-    memcpy(q.queue, temp, sizeof(temp));
 
+    for (int i = 0; i < 4; ++i) {
+        q.queue[i] = -1;
+    }
+
+    for (int i = 0; i < 3; ++i) {
+        q.upQueue[i]   = -1;
+        q.downQueue[i] = -1;
+    }
+    q.queueDirUp = true;
 
     for(int floor = 0; floor < 4; floor++){
         q.heispanel.goalButtons[floor].buttonType = BUTTON_CAB;
