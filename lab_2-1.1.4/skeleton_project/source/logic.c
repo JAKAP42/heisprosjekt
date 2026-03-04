@@ -77,37 +77,12 @@ void run(QueueManager* q){
     }
     //Mer her kanskje
 }
+
+
 void decideDirection(QueueManager* q){
-    if (q->queueDirUp)
+    if (q->queue[0] == -1)
     {
-        /* determine if there are any requests above current floor */
-        bool requestAbove = false;
-        for (int i = 0; i < 3 && !requestAbove; ++i) {
-            if (q->upQueue[i] > q->story || q->downQueue[i] > q->story) {
-                requestAbove = true;
-            }
-        }
-        
-        /* only turn around when there are no further requests above or we're at the top */
-        if (!requestAbove || q->story >= N_FLOORS - 1) {
-            q->queueDirUp = false;
-        }
-    }
-    else
-    {
-        /* determine if there are any requests below current floor */
-        bool requestBelow = false;
-        for (int i = 0; i < 3 && !requestBelow; ++i) {
-            if ((q->upQueue[i] != -1 && q->upQueue[i] < q->story) ||
-                (q->downQueue[i] != -1 && q->downQueue[i] < q->story)) {
-                requestBelow = true;
-            }
-        }
-        
-        /* only switch back up when no requests remain below or we're at bottom */
-        if (!requestBelow || q->story <= 0) {
-            q->queueDirUp = true;
-        }
+        q->queueDirUp = !q->queueDirUp;
     }
 } 
 
@@ -170,20 +145,32 @@ void updateQueue(QueueManager* q){
                 placeOrderInQueue(q, i, false);
             }
         }
+        if(checkPanelButton(&q->etasjepanel,i,true)){
+            if (q->story < i)
+            {
+                //logikk for å plassere den relevante forespørselen i opp køen
+                placeOrderInQueue(q, i, true);
+            }
+            else if (q->story > i)
+            {
+                //logikk for å plassere den relevante forespørselen i ned køen
+                placeOrderInQueue(q, i, false);
+            }
+        }
+        if(checkPanelButton(&q->etasjepanel,i,false)){
+            if (q->story > i)
+            {
+                //logikk for å plassere den relevante forespørselen i ned køen
+                placeOrderInQueue(q, i, true);
+            }
+            else if (q->story > i)
+            {
+                //logikk for å plassere den relevante forespørselen i ned køen
+                placeOrderInQueue(q, i, false);
+            }
+        }
     }
 
-    for(int i = 0; i<3;i++){ //sjekker opp knappene
-        if(checkPanelButton(&q->etasjepanel,i,true)){
-            //logikk for å plassere den relevante forespørselen i køen
-            placeOrderInQueue(q, i, true);
-        }
-    }
-    for(int i = 1; i<4;i++){ //sjekker ned knappene
-        if(checkPanelButton(&q->etasjepanel,i,false)){
-            //logikk for å plassere den relevante forespørselen i køen
-            placeOrderInQueue(q, i, false);
-        }
-    }
     
     /* decide direction before assigning next target */
     decideDirection(q);
