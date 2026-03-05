@@ -46,6 +46,9 @@ void updateStory(QueueManager* q){
 
 void run(QueueManager* q){
     updateEverything(q);
+    for (int i = 0; i<6; i++){
+        elevio_buttonLamp(q->etasjepanel.callButtons[i].story, q->etasjepanel.callButtons[i].buttonType, q->etasjepanel.callButtons[i].active);
+    }
     int target = q->queue[0];
     if (target != -1)
     {
