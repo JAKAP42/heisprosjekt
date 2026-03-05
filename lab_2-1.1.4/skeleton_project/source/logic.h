@@ -32,6 +32,7 @@ void updateStory(QueueManager* q);
 void updateAllSensors(QueueManager* q);
 void updateEverything(QueueManager* q);
 void placeOrderInQueue(QueueManager* q, int story, bool directionUp);
+void clearDirectionQueue(QueueManager* q, bool clearUpQueue);
 void decideDirection(QueueManager* q);
 void run(QueueManager* q);
 QueueManager createQueueManager();
