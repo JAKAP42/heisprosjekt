@@ -1,5 +1,6 @@
 #pragma once
 #include <stdbool.h>
+#include <time.h>
 #include "driver/elevio.h"  // for MotorDirection
 #include "sensors.h"
 
@@ -24,9 +25,13 @@ typedef struct {
     int downQueue[3];
     bool queueDirUp;
     ObstructionButton obstructionButton;
+    bool motorPauseActive;
+    time_t motorPauseUntil;
 }QueueManager;
 
 //liksomMetoder
+void startMotorPause(QueueManager* q, double seconds);
+bool isMotorPauseActive(QueueManager* q);
 void updateQueue(QueueManager* q);
 void updateStory(QueueManager* q);
 void updateAllSensors(QueueManager* q);

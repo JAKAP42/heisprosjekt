@@ -3,11 +3,9 @@
 // use N_FLOORS macro from elevio.h instead of separate variable
 
 void updateButton(CallButton* call){
-    int active = elevio_callButton(call->story, call->buttonType);
-    if (active == 1){
+    int pressed = elevio_callButton(call->story, call->buttonType);
+    if (pressed == 1){
         call->active = true;
-    } else {
-        call->active = false;
     }
 }
 
@@ -20,7 +18,7 @@ void updateStoryButtons(HeisPanel* panel){
     }
 }
 void updatePanelButtons(EtasjePanel* panel){
-    for(int i = 0; i < N_FLOORS; i++){
+    for(int i = 0; i < 6; i++){
         updateButton(&(panel->callButtons[i]));
     }
 }
@@ -33,7 +31,7 @@ bool checkStoryButton(HeisPanel* panel, int story){
     return false;
 }
 bool checkPanelButton(EtasjePanel* panel, int story, bool directionUp){
-    for(int i = 0; i < N_FLOORS; i++){
+    for(int i = 0; i < 6; i++){
         if(panel->callButtons[i].story == story && panel->callButtons[i].active && panel->callButtons[i].buttonType == (directionUp ? BUTTON_HALL_UP : BUTTON_HALL_DOWN)){
             return true;
         }

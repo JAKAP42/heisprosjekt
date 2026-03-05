@@ -44,17 +44,66 @@ void updateStory(QueueManager* q){
     }
 }
 
+void startMotorPause(QueueManager* q, double seconds){
+    q->motorPauseActive = true;
+    q->motorPauseUntil = time(NULL) + (time_t)seconds;
+    elevio_doorOpenLamp(1);
+    elevatorChange(&(q->elevator), false, true);
+}
+
+bool isMotorPauseActive(QueueManager* q){
+    if (!q->motorPauseActive){
+        return false;
+    }
+    if (time(NULL) < q->motorPauseUntil){
+        return true;
+    }
+
+    q->motorPauseActive = false;
+    elevio_doorOpenLamp(0);
+    return false;
+}
+
+static void clearOrdersAtFloor(QueueManager* q, int floor){
+    if (floor < 0 || floor >= N_FLOORS){
+        return;
+    }
+
+    q->heispanel.goalButtons[floor].active = false;
+
+    for (int i = 0; i < 6; i++){
+        if (q->etasjepanel.callButtons[i].story == floor){
+            q->etasjepanel.callButtons[i].active = false;
+        }
+    }
+}
+
+
 void run(QueueManager* q){
     updateEverything(q);
-    for (int i = 0; i<6; i++){
-        elevio_buttonLamp(q->etasjepanel.callButtons[i].story, q->etasjepanel.callButtons[i].buttonType, q->etasjepanel.callButtons[i].active);
+
+    for (int floor = 0; floor < N_FLOORS; floor++){
+        elevio_buttonLamp(floor, BUTTON_CAB, q->heispanel.goalButtons[floor].active);
+    }
+
+    for (int i = 0; i < 6; i++){
+        elevio_buttonLamp(
+            q->etasjepanel.callButtons[i].story,
+            q->etasjepanel.callButtons[i].buttonType,
+            q->etasjepanel.callButtons[i].active
+        );
+    }
+    if (isMotorPauseActive(q)){
+        elevatorChange(&(q->elevator), false, true);
+        return;
     }
     int target = q->queue[0];
     if (target != -1)
     {
         if (target == q->story)
         {
-            elevatorChange(&(q->elevator), false, true);
+            clearOrdersAtFloor(q, q->story);
+            startMotorPause(q, 3.0);
             for (int i = 0; i < 3; i++)
             {
                 q->queue[i] = q->queue[i+1];
@@ -224,6 +273,9 @@ QueueManager createQueueManager(){
     q.elevator.direction = DIRN_STOP;
     q.story = -1;
     q.obstructionButton.state = false;
+    q.motorPauseActive = false;
+    q.motorPauseUntil = 0;
+    elevio_doorOpenLamp(0);
 
     for (int i = 0; i < 4; ++i) {
         q.queue[i] = -1;
