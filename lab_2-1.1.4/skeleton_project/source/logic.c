@@ -51,7 +51,7 @@ void run(QueueManager* q){
     {
         if (target == q->story)
         {
-            
+
             elevatorChange(&(q->elevator), false, true);
             for (int i = 0; i < 3; i++)
             {
@@ -131,6 +131,13 @@ void placeOrderInQueue(QueueManager* q, int story, bool directionUp){
     }
 }
 
+void clearDirectionQueue(QueueManager* q, bool clearUpQueue){
+    int* queueToClear = clearUpQueue ? q->upQueue : q->downQueue;
+    for (int i = 0; i < 3; ++i) {
+        queueToClear[i] = -1;
+    }
+}
+
 
 // stub for updateQueue; actual queue behavior not implemented yet
 void updateQueue(QueueManager* q){
@@ -180,6 +187,7 @@ void updateQueue(QueueManager* q){
         for (int i = 0; i < 3; ++i) {
             q->queue[i] = q->upQueue[i];
         }
+        clearDirectionQueue(q, true);
         /* bubble sort ascending */
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 2; ++j) {
@@ -198,6 +206,7 @@ void updateQueue(QueueManager* q){
         for (int i = 0; i < 3; ++i) {
             q->queue[i] = q->downQueue[i];
         }
+        clearDirectionQueue(q, false);
         /* bubble sort descending */
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 2; ++j) {
