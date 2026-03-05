@@ -25,9 +25,9 @@ void elevatorChange(Elevator* e,bool on, bool newDirectionUp){
 
 //liksomMetoder Queue manager
 void updateEverything(QueueManager* q){
-    updateQueue(q);
-    updateAllSensors(q);
     updateStory(q);
+    updateAllSensors(q);
+    updateQueue(q);
 }
 
 void updateAllSensors(QueueManager* q){
@@ -172,6 +172,10 @@ void updateQueue(QueueManager* q){
             if (q->story > i)
             {
                 placeOrderInQueue(q, i, false);
+            }
+            else if (q->story < i)
+            {
+                placeOrderInQueue(q, i, true);
             }
         }
     }
