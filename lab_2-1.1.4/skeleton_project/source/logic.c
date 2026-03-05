@@ -60,14 +60,18 @@ void run(QueueManager* q){
         }
         else
         {
-            /* obey the current scheduling direction; ignore target relative position */
-            if (q->queueDirUp)
+            /* drive toward the active target floor */
+            if (q->story < target)
             {
                 elevatorChange(&(q->elevator), true, true);
             }
-            else
+            else if (q->story > target)
             {
                 elevatorChange(&(q->elevator), true, false);
+            }
+            else
+            {
+                elevatorChange(&(q->elevator), false, true);
             }
         }
     }
@@ -132,7 +136,7 @@ void placeOrderInQueue(QueueManager* q, int story, bool directionUp){
 void updateQueue(QueueManager* q){
     //q->queue starter som en array slik {-1,-1,-1,-1,-1,-1}. -1 betegner ingen etasje er satt da står d stille.
     //heisen er 0 indeksert med 4 etasjer.
-    for (int i = 0; i<3; i++){
+    for (int i = 0; i < N_FLOORS; i++){
         if(checkStoryButton(&q->heispanel,i)){
             if (q->story < i)
             {
@@ -160,12 +164,6 @@ void updateQueue(QueueManager* q){
         if(checkPanelButton(&q->etasjepanel,i,false)){
             if (q->story > i)
             {
-                //logikk for å plassere den relevante forespørselen i ned køen
-                placeOrderInQueue(q, i, true);
-            }
-            else if (q->story > i)
-            {
-                //logikk for å plassere den relevante forespørselen i ned køen
                 placeOrderInQueue(q, i, false);
             }
         }

@@ -1,6 +1,7 @@
 #include "sensors.h"
 
 // use N_FLOORS macro from elevio.h instead of separate variable
+#define N_CALL_BUTTONS 6
 
 void updateButton(CallButton* call){
     int active = elevio_callButton(call->story, call->buttonType);
@@ -20,7 +21,7 @@ void updateStoryButtons(HeisPanel* panel){
     }
 }
 void updatePanelButtons(EtasjePanel* panel){
-    for(int i = 0; i < N_FLOORS; i++){
+    for(int i = 0; i < N_CALL_BUTTONS; i++){
         updateButton(&(panel->callButtons[i]));
     }
 }
@@ -33,7 +34,7 @@ bool checkStoryButton(HeisPanel* panel, int story){
     return false;
 }
 bool checkPanelButton(EtasjePanel* panel, int story, bool directionUp){
-    for(int i = 0; i < N_FLOORS; i++){
+    for(int i = 0; i < N_CALL_BUTTONS; i++){
         if(panel->callButtons[i].story == story && panel->callButtons[i].active && panel->callButtons[i].buttonType == (directionUp ? BUTTON_HALL_UP : BUTTON_HALL_DOWN)){
             return true;
         }
