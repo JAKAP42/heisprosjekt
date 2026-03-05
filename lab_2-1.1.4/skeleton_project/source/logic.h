@@ -34,6 +34,8 @@ void updateAllSensors(QueueManager* q);
 void updateEverything(QueueManager* q);
 void placeOrderInQueue(QueueManager* q, int story, bool directionUp);
 void clearDirectionQueue(QueueManager* q, bool clearUpQueue);
+void turnOffLampsOnStory(int story);
+void turnOnLampForButton(int story, ButtonType buttonType);
 void decideDirection(QueueManager* q);
 void run(QueueManager* q);
 QueueManager createQueueManager();

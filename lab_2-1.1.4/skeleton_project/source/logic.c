@@ -20,6 +20,35 @@ static int storyRelation(const QueueManager* q, int targetStory){
     return 0;
 }
 
+void turnOffLampsOnStory(int story){
+    if (story < 0 || story >= N_FLOORS) {
+        return;
+    }
+
+    elevio_buttonLamp(story, BUTTON_CAB, 0);
+    if (story < N_FLOORS - 1) {
+        elevio_buttonLamp(story, BUTTON_HALL_UP, 0);
+    }
+    if (story > 0) {
+        elevio_buttonLamp(story, BUTTON_HALL_DOWN, 0);
+    }
+}
+
+void turnOnLampForButton(int story, ButtonType buttonType){
+    if (story < 0 || story >= N_FLOORS) {
+        return;
+    }
+    if (buttonType == BUTTON_HALL_UP && story == N_FLOORS - 1) {
+        return;
+    }
+    if (buttonType == BUTTON_HALL_DOWN && story == 0) {
+        return;
+    }
+    elevio_buttonLamp(story, buttonType, 1);
+}
+
+
+
 //metoder Elevator
 void elevatorChange(Elevator* e,bool on, bool newDirectionUp){
     if (on)
@@ -68,7 +97,7 @@ void run(QueueManager* q){
     {
         if (target == q->story)
         {
-
+            turnOffLampsOnStory(target);
             elevatorChange(&(q->elevator), false, true);
             for (int i = 0; i < 3; i++)
             {
@@ -163,6 +192,7 @@ void updateQueue(QueueManager* q){
     for (int i = 0; i < N_FLOORS; i++){
         int relation = storyRelation(q, i);
         if(checkStoryButton(&q->heispanel,i)){
+            turnOnLampForButton(i, BUTTON_CAB);
             if (relation < 0)
             {
                 //logikk for å plassere den relevante forespørselen i opp køen
@@ -175,6 +205,7 @@ void updateQueue(QueueManager* q){
             }
         }
         if(checkPanelButton(&q->etasjepanel,i,true)){
+            turnOnLampForButton(i, BUTTON_HALL_UP);
             if (relation < 0)
             {
                 //logikk for å plassere den relevante forespørselen i opp køen
@@ -187,6 +218,7 @@ void updateQueue(QueueManager* q){
             }
         }
         if(checkPanelButton(&q->etasjepanel,i,false)){
+            turnOnLampForButton(i, BUTTON_HALL_DOWN);
             if (relation > 0)
             {
                 placeOrderInQueue(q, i, false);
