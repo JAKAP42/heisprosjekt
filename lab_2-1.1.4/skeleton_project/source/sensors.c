@@ -16,7 +16,6 @@ void updateButton(CallButton* call){
 
 void updateStoryButtons(HeisPanel* panel){
     for(int i = 0; i < N_FLOORS; i++){
-        // goalButtons and callButtons share the same layout; cast to reuse updateButton
         updateButton((CallButton*)&(panel->goalButtons[i]));
     }
 }
@@ -43,5 +42,6 @@ bool checkPanelButton(EtasjePanel* panel, int story, bool directionUp){
 }
 
 void updateObstruction(ObstructionButton* o){
-    o->state = (bool)elevio_obstruction();
+//    o->state = elevio_obstruction();
+    o->state = 0;
 }
