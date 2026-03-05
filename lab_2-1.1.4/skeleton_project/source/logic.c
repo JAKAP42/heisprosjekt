@@ -260,6 +260,79 @@ void updateQueue(QueueManager* q){
         clearDirectionQueue(q, q->lastQueueDirUp);
         q->lastQueueDirUp = q->queueDirUp;
     }
+
+    /* Merge new orders from the active direction queue into the running main queue. */
+    if (q->queueDirUp) {
+        for (int i = 0; i < 3; ++i) {
+            int story = q->upQueue[i];
+            if (story == -1) {
+                continue;
+            }
+            bool exists = false;
+            for (int j = 0; j < 4; ++j) {
+                if (q->queue[j] == story) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                for (int j = 0; j < 4; ++j) {
+                    if (q->queue[j] == -1) {
+                        q->queue[j] = story;
+                        break;
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                if (q->queue[j] == -1 && q->queue[j + 1] != -1) {
+                    int tmp = q->queue[j];
+                    q->queue[j] = q->queue[j + 1];
+                    q->queue[j + 1] = tmp;
+                } else if (q->queue[j] != -1 && q->queue[j + 1] != -1 && q->queue[j] > q->queue[j + 1]) {
+                    int tmp = q->queue[j];
+                    q->queue[j] = q->queue[j + 1];
+                    q->queue[j + 1] = tmp;
+                }
+            }
+        }
+    } else {
+        for (int i = 0; i < 3; ++i) {
+            int story = q->downQueue[i];
+            if (story == -1) {
+                continue;
+            }
+            bool exists = false;
+            for (int j = 0; j < 4; ++j) {
+                if (q->queue[j] == story) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                for (int j = 0; j < 4; ++j) {
+                    if (q->queue[j] == -1) {
+                        q->queue[j] = story;
+                        break;
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                if (q->queue[j] == -1 && q->queue[j + 1] != -1) {
+                    int tmp = q->queue[j];
+                    q->queue[j] = q->queue[j + 1];
+                    q->queue[j + 1] = tmp;
+                } else if (q->queue[j] != -1 && q->queue[j + 1] != -1 && q->queue[j] < q->queue[j + 1]) {
+                    int tmp = q->queue[j];
+                    q->queue[j] = q->queue[j + 1];
+                    q->queue[j + 1] = tmp;
+                }
+            }
+        }
+    }
     
     /* only refill the main queue when it is empty */
     if (q->queue[0] == -1) {
