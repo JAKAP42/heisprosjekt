@@ -179,17 +179,27 @@ void updateQueue(QueueManager* q){
     
     /* decide direction before assigning next target */
     decideDirection(q);
+    if (q->queueDirUp != q->lastQueueDirUp) {
+        /* clear the queue from the previous travel direction on direction switch */
+        clearDirectionQueue(q, q->lastQueueDirUp);
+        q->lastQueueDirUp = q->queueDirUp;
+    }
     
     /* only refill the main queue when it is empty */
     if (q->queue[0] == -1) {
         /* copy all items from the active direction queue into the main queue */
         if (q->queueDirUp)
         {
-            /* sort upQueue in ascending order */
-            for (int i = 0; i < 3; ++i) {
-                q->queue[i] = q->upQueue[i];
+            /* copy only valid floors from upQueue */
+            for (int i = 0; i < 4; ++i) {
+                q->queue[i] = -1;
             }
-            clearDirectionQueue(q, true);
+            int next = 0;
+            for (int i = 0; i < 3; ++i) {
+                if (q->upQueue[i] != -1 && next < 4) {
+                    q->queue[next++] = q->upQueue[i];
+                }
+            }
             /* bubble sort ascending */
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 2; ++j) {
@@ -204,11 +214,16 @@ void updateQueue(QueueManager* q){
         }
         else
         {
-            /* sort downQueue in descending order */
-            for (int i = 0; i < 3; ++i) {
-                q->queue[i] = q->downQueue[i];
+            /* copy only valid floors from downQueue */
+            for (int i = 0; i < 4; ++i) {
+                q->queue[i] = -1;
             }
-            clearDirectionQueue(q, false);
+            int next = 0;
+            for (int i = 0; i < 3; ++i) {
+                if (q->downQueue[i] != -1 && next < 4) {
+                    q->queue[next++] = q->downQueue[i];
+                }
+            }
             /* bubble sort descending */
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 2; ++j) {
@@ -241,6 +256,7 @@ QueueManager createQueueManager(){
         q.downQueue[i] = -1;
     }
     q.queueDirUp = true;
+    q.lastQueueDirUp = true;
 
     for(int floor = 0; floor < 4; floor++){
         q.heispanel.goalButtons[floor].buttonType = BUTTON_CAB;
