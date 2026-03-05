@@ -51,6 +51,7 @@ void run(QueueManager* q){
     {
         if (target == q->story)
         {
+            
             elevatorChange(&(q->elevator), false, true);
             for (int i = 0; i < 3; i++)
             {
@@ -128,7 +129,6 @@ void placeOrderInQueue(QueueManager* q, int story, bool directionUp){
             }
         }
     }
-
 }
 
 
