@@ -5,7 +5,20 @@
 
 static void removeStoryFromArray(int* queue, int size, int story);
 
-/* -1: below target story, 0: at target story, 1: above target story */
+void obstruction(QueueManager* q){
+    deleteAllOrders(q);
+    for (int i = 0; i < N_FLOORS; i++)
+    {
+        turnOffLampsOnStory(i);
+    }
+    if (elevio_floorSensor() != -1)
+    {
+        elevio_doorOpenLamp(1);
+    }
+    
+}
+
+
 static int storyRelation(const QueueManager* q, int targetStory){
     int sensorStory = elevio_floorSensor();
     if (sensorStory >= 0) {
@@ -14,7 +27,6 @@ static int storyRelation(const QueueManager* q, int targetStory){
         return 0;
     }
 
-    /* Between floors: use last known story and travel direction. */
     if (q->story < targetStory) return -1;
     if (q->story > targetStory) return 1;
     if (q->elevator.direction == DIRN_UP) return 1;
@@ -49,7 +61,15 @@ void turnOnLampForButton(int story, ButtonType buttonType){
     elevio_buttonLamp(story, buttonType, 1);
 }
 
-
+void deleteAllOrders(QueueManager* q){
+    for (int i = 0; i < 4; ++i) {
+        q->queue[i] = -1;
+    }
+    for (int i = 0; i < 3; ++i) {
+        q->upQueue[i] = -1;
+        q->downQueue[i] = -1;
+    }
+}
 
 void startMotorPause(QueueManager* q, double seconds){
     q->motorPauseActive = true;
@@ -74,7 +94,7 @@ bool isMotorPauseActive(QueueManager* q){
 
 //metoder Elevator
 void elevatorChange(QueueManager* q, Elevator* e, bool on, bool newDirectionUp){
-    if (on && !isMotorPauseActive(q))
+    if (on && !isMotorPauseActive(q) && !q->obstructionButton.state)
     {
         if (newDirectionUp)
         {
@@ -97,6 +117,12 @@ void updateEverything(QueueManager* q){
     updateStory(q);
     updateAllSensors(q);
     updateQueue(q);
+    updateObstruction(&q->obstructionButton);
+    if (q->obstructionButton.state)
+    {
+        obstruction(q);
+    }
+    
 }
 
 void updateAllSensors(QueueManager* q){
@@ -436,6 +462,8 @@ QueueManager createQueueManager(){
     q.etasjepanel.callButtons[3] = (CallButton){.buttonType = BUTTON_HALL_UP,   .story = 2, .active = false};
     q.etasjepanel.callButtons[4] = (CallButton){.buttonType = BUTTON_HALL_DOWN, .story = 2, .active = false};
     q.etasjepanel.callButtons[5] = (CallButton){.buttonType = BUTTON_HALL_DOWN, .story = 3, .active = false};
+
+
 
     return q;
 }

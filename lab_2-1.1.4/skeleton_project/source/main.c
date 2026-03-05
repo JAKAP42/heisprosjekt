@@ -18,7 +18,11 @@ int main(){
     printf("=== Example Program ===\n");
     printf("Press the stop button on the elevator panel to exit\n");
 
-    elevio_motorDirection(DIRN_UP);
+    for (int i = 0; i < N_FLOORS; i++)
+    {
+        turnOffLampsOnStory(i);
+    }
+    elevio_motorDirection(DIRN_DOWN);
 
 
     QueueManager q = createQueueManager();

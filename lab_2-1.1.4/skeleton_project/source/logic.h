@@ -45,5 +45,7 @@ void turnOffLampsOnStory(int story);
 void turnOnLampForButton(int story, ButtonType buttonType);
 void decideDirection(QueueManager* q);
 void run(QueueManager* q);
+void deleteAllOrders(QueueManager* q);
+void obstruction(QueueManager* q);
 QueueManager createQueueManager();
 
