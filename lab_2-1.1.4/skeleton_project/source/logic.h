@@ -1,5 +1,6 @@
 #pragma once
 #include <stdbool.h>
+#include <time.h>
 #include "driver/elevio.h"  // for MotorDirection
 #include "sensors.h"
 
@@ -10,10 +11,12 @@ typedef struct{
 
 }Elevator;
 
-//liksomMetoder
-void elevatorChange(Elevator* e,bool on, bool newDirectionUp);
+typedef struct QueueManager QueueManager;
 
-typedef struct {
+//liksomMetoder
+void elevatorChange(QueueManager* q, Elevator* e, bool on, bool newDirectionUp);
+
+struct QueueManager {
     //variabler
     Elevator elevator;
     EtasjePanel etasjepanel;
@@ -22,12 +25,16 @@ typedef struct {
     int story;
     int upQueue[3];
     int downQueue[3];
+    bool motorPauseActive;
+    time_t motorPauseUntil;
     bool queueDirUp;
     bool lastQueueDirUp;
     ObstructionButton obstructionButton;
-}QueueManager;
+};
 
 //liksomMetoder
+void startMotorPause(QueueManager* q, double seconds);
+bool isMotorPauseActive(QueueManager* q);
 void updateQueue(QueueManager* q);
 void updateStory(QueueManager* q);
 void updateAllSensors(QueueManager* q);

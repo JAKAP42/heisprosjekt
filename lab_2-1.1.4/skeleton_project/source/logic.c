@@ -49,9 +49,30 @@ void turnOnLampForButton(int story, ButtonType buttonType){
 
 
 
+void startMotorPause(QueueManager* q, double seconds){
+    q->motorPauseActive = true;
+    q->motorPauseUntil = time(NULL) + (time_t)seconds;
+    elevio_doorOpenLamp(1);
+    elevatorChange(q, &(q->elevator), false, true);
+}
+
+bool isMotorPauseActive(QueueManager* q){
+    if (!q->motorPauseActive){
+        return false;
+    }
+    if (time(NULL) < q->motorPauseUntil){
+        return true;
+    }
+
+    q->motorPauseActive = false;
+    elevio_doorOpenLamp(0);
+    return false;
+}
+
+
 //metoder Elevator
-void elevatorChange(Elevator* e,bool on, bool newDirectionUp){
-    if (on)
+void elevatorChange(QueueManager* q, Elevator* e, bool on, bool newDirectionUp){
+    if (on && !isMotorPauseActive(q))
     {
         if (newDirectionUp)
         {
@@ -98,7 +119,8 @@ void run(QueueManager* q){
         if (target == q->story)
         {
             turnOffLampsOnStory(target);
-            elevatorChange(&(q->elevator), false, true);
+            startMotorPause(q, 3.0);
+            elevatorChange(q, &(q->elevator), false, true);
             for (int i = 0; i < 3; i++)
             {
                 q->queue[i] = q->queue[i+1];
@@ -110,21 +132,21 @@ void run(QueueManager* q){
             /* drive toward the active target floor */
             if (q->story < target)
             {
-                elevatorChange(&(q->elevator), true, true);
+                elevatorChange(q, &(q->elevator), true, true);
             }
             else if (q->story > target)
             {
-                elevatorChange(&(q->elevator), true, false);
+                elevatorChange(q, &(q->elevator), true, false);
             }
             else
             {
-                elevatorChange(&(q->elevator), false, true);
+                elevatorChange(q, &(q->elevator), false, true);
             }
         }
     }
     else
     {
-        elevatorChange(&(q->elevator), false, true);
+        elevatorChange(q, &(q->elevator), false, true);
     }
     //Mer her kanskje
 }
@@ -300,6 +322,8 @@ QueueManager createQueueManager(){
     q.elevator.direction = DIRN_STOP;
     q.story = -1;
     q.obstructionButton.state = false;
+    q.motorPauseActive = false;
+    q.motorPauseUntil = 0;
 
     for (int i = 0; i < 4; ++i) {
         q.queue[i] = -1;
