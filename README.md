@@ -1,1 +1,55 @@
 # heisprosjekt
+
+
+student@sanntidssalen:~/Desktop/jacobJulian/heisprosjekt/lab_2-1.1.4/skeleton_project$ ./elevator
+=== Example Program ===
+Press the stop button on the elevator panel to exit
+=================================================================
+==90458==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7849eab000c9 at pc 0x5e360de3a546 bp 0x7ffe2b78f6e0 sp 0x7ffe2b78f6d8
+WRITE of size 1 at 0x7849eab000c9 thread T0
+    #0 0x5e360de3a545 in createQueueManager /home/student/Desktop/jacobJulian/heisprosjekt/lab_2-1.1.4/skeleton_project/source/logic.c:223:31
+    #1 0x5e360de3c114 in main /home/student/Desktop/jacobJulian/heisprosjekt/lab_2-1.1.4/skeleton_project/source/main.c:24:22
+    #2 0x7849ec82a1c9 in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16
+    #3 0x7849ec82a28a in __libc_start_main csu/../csu/libc-start.c:360:3
+    #4 0x5e360dd5f3b4 in _start (/home/student/Desktop/jacobJulian/heisprosjekt/lab_2-1.1.4/skeleton_project/elevator+0x2c3b4) (BuildId: c7a67fbe29d0ec1c7e3c32680163dd6cf8467d81)
+
+Address 0x7849eab000c9 is located in stack of thread T0 at offset 201 in frame
+    #0 0x5e360de3bfef in main /home/student/Desktop/jacobJulian/heisprosjekt/lab_2-1.1.4/skeleton_project/source/main.c:15
+
+  This frame has 1 object(s):
+    [32, 188) 'q' (line 24) <== Memory access at offset 201 overflows this variable
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /home/student/Desktop/jacobJulian/heisprosjekt/lab_2-1.1.4/skeleton_project/source/logic.c:223:31 in createQueueManager
+Shadow bytes around the buggy address:
+  0x7849eaaffe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7849eaaffe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7849eaafff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7849eaafff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7849eab00000: f1 f1 f1 f1 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x7849eab00080: 00 00 00 00 00 00 00 04 f3[f3]f3 f3 f3 f3 f3 f3
+  0x7849eab00100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7849eab00180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7849eab00200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7849eab00280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7849eab00300: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==90458==ABORTING
