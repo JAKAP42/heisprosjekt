@@ -42,6 +42,5 @@ bool checkPanelButton(EtasjePanel* panel, int story, bool directionUp){
 }
 
 void updateObstruction(ObstructionButton* o){
-//    o->state = elevio_obstruction();
-    o->state = 0;
+    o->state = elevio_obstruction() == 1;
 }
