@@ -180,44 +180,47 @@ void updateQueue(QueueManager* q){
     /* decide direction before assigning next target */
     decideDirection(q);
     
-    /* copy all items from the active direction queue into the main queue */
-    if (q->queueDirUp)
-    {
-        /* sort upQueue in ascending order */
-        for (int i = 0; i < 3; ++i) {
-            q->queue[i] = q->upQueue[i];
-        }
-        clearDirectionQueue(q, true);
-        /* bubble sort ascending */
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 2; ++j) {
-                if (q->queue[j] != -1 && q->queue[j+1] != -1 && q->queue[j] > q->queue[j+1]) {
-                    int temp = q->queue[j];
-                    q->queue[j] = q->queue[j+1];
-                    q->queue[j+1] = temp;
+    /* only refill the main queue when it is empty */
+    if (q->queue[0] == -1) {
+        /* copy all items from the active direction queue into the main queue */
+        if (q->queueDirUp)
+        {
+            /* sort upQueue in ascending order */
+            for (int i = 0; i < 3; ++i) {
+                q->queue[i] = q->upQueue[i];
+            }
+            clearDirectionQueue(q, true);
+            /* bubble sort ascending */
+            for (int i = 0; i < 3; ++i) {
+                for (int j = 0; j < 2; ++j) {
+                    if (q->queue[j] != -1 && q->queue[j+1] != -1 && q->queue[j] > q->queue[j+1]) {
+                        int temp = q->queue[j];
+                        q->queue[j] = q->queue[j+1];
+                        q->queue[j+1] = temp;
+                    }
                 }
             }
+            q->queue[3] = -1;
         }
-        q->queue[3] = -1;
-    }
-    else
-    {
-        /* sort downQueue in descending order */
-        for (int i = 0; i < 3; ++i) {
-            q->queue[i] = q->downQueue[i];
-        }
-        clearDirectionQueue(q, false);
-        /* bubble sort descending */
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 2; ++j) {
-                if (q->queue[j] != -1 && q->queue[j+1] != -1 && q->queue[j] < q->queue[j+1]) {
-                    int temp = q->queue[j];
-                    q->queue[j] = q->queue[j+1];
-                    q->queue[j+1] = temp;
+        else
+        {
+            /* sort downQueue in descending order */
+            for (int i = 0; i < 3; ++i) {
+                q->queue[i] = q->downQueue[i];
+            }
+            clearDirectionQueue(q, false);
+            /* bubble sort descending */
+            for (int i = 0; i < 3; ++i) {
+                for (int j = 0; j < 2; ++j) {
+                    if (q->queue[j] != -1 && q->queue[j+1] != -1 && q->queue[j] < q->queue[j+1]) {
+                        int temp = q->queue[j];
+                        q->queue[j] = q->queue[j+1];
+                        q->queue[j+1] = temp;
+                    }
                 }
             }
+            q->queue[3] = -1;
         }
-        q->queue[3] = -1;
     }
     
 }
