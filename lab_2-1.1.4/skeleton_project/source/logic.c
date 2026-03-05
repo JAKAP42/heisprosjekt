@@ -3,6 +3,8 @@
 #include <stdio.h>   
 #include <string.h>  
 
+static void removeStoryFromArray(int* queue, int size, int story);
+
 /* -1: below target story, 0: at target story, 1: above target story */
 static int storyRelation(const QueueManager* q, int targetStory){
     int sensorStory = elevio_floorSensor();
@@ -121,6 +123,8 @@ void run(QueueManager* q){
             turnOffLampsOnStory(target);
             startMotorPause(q, 3.0);
             elevatorChange(q, &(q->elevator), false, true);
+            removeStoryFromArray(q->upQueue, 3, target);
+            removeStoryFromArray(q->downQueue, 3, target);
             for (int i = 0; i < 3; i++)
             {
                 q->queue[i] = q->queue[i+1];
@@ -203,6 +207,18 @@ void clearDirectionQueue(QueueManager* q, bool clearUpQueue){
     int* queueToClear = clearUpQueue ? q->upQueue : q->downQueue;
     for (int i = 0; i < 3; ++i) {
         queueToClear[i] = -1;
+    }
+}
+
+static void removeStoryFromArray(int* queue, int size, int story){
+    for (int i = 0; i < size; ++i) {
+        if (queue[i] == story) {
+            for (int j = i; j < size - 1; ++j) {
+                queue[j] = queue[j + 1];
+            }
+            queue[size - 1] = -1;
+            --i;
+        }
     }
 }
 
