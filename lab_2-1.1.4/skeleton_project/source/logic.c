@@ -133,7 +133,6 @@ void run(QueueManager* q){
         }
         else
         {
-            /* drive toward the active target floor */
             if (q->story < target)
             {
                 elevatorChange(q, &(q->elevator), true, true);
