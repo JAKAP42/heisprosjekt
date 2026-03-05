@@ -3,6 +3,23 @@
 #include <stdio.h>   
 #include <string.h>  
 
+/* -1: below target story, 0: at target story, 1: above target story */
+static int storyRelation(const QueueManager* q, int targetStory){
+    int sensorStory = elevio_floorSensor();
+    if (sensorStory >= 0) {
+        if (sensorStory < targetStory) return -1;
+        if (sensorStory > targetStory) return 1;
+        return 0;
+    }
+
+    /* Between floors: use last known story and travel direction. */
+    if (q->story < targetStory) return -1;
+    if (q->story > targetStory) return 1;
+    if (q->elevator.direction == DIRN_UP) return 1;
+    if (q->elevator.direction == DIRN_DOWN) return -1;
+    return 0;
+}
+
 //metoder Elevator
 void elevatorChange(Elevator* e,bool on, bool newDirectionUp){
     if (on)
@@ -144,36 +161,37 @@ void updateQueue(QueueManager* q){
     //q->queue starter som en array slik {-1,-1,-1,-1,-1,-1}. -1 betegner ingen etasje er satt da står d stille.
     //heisen er 0 indeksert med 4 etasjer.
     for (int i = 0; i < N_FLOORS; i++){
+        int relation = storyRelation(q, i);
         if(checkStoryButton(&q->heispanel,i)){
-            if (q->story < i)
+            if (relation < 0)
             {
                 //logikk for å plassere den relevante forespørselen i opp køen
                 placeOrderInQueue(q, i, true);
             }
-            else if (q->story > i)
+            else if (relation > 0)
             {
                 //logikk for å plassere den relevante forespørselen i ned køen
                 placeOrderInQueue(q, i, false);
             }
         }
         if(checkPanelButton(&q->etasjepanel,i,true)){
-            if (q->story < i)
+            if (relation < 0)
             {
                 //logikk for å plassere den relevante forespørselen i opp køen
                 placeOrderInQueue(q, i, true);
             }
-            else if (q->story > i)
+            else if (relation > 0)
             {
                 //logikk for å plassere den relevante forespørselen i ned køen
                 placeOrderInQueue(q, i, false);
             }
         }
         if(checkPanelButton(&q->etasjepanel,i,false)){
-            if (q->story > i)
+            if (relation > 0)
             {
                 placeOrderInQueue(q, i, false);
             }
-            else if (q->story < i)
+            else if (relation < 0)
             {
                 placeOrderInQueue(q, i, true);
             }
