@@ -23,6 +23,7 @@ typedef struct {
     int upQueue[3];
     int downQueue[3];
     bool queueDirUp;
+    bool lastQueueDirUp;
     ObstructionButton obstructionButton;
 }QueueManager;
 
