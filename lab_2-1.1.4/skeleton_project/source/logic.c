@@ -442,7 +442,7 @@ QueueManager createQueueManager(){
     for (int i = 0; i < 4; ++i) {
         q.queue[i] = -1;
     }
-
+    q.queue[0] = 0;
     for (int i = 0; i < 3; ++i) {
         q.upQueue[i]   = -1;
         q.downQueue[i] = -1;
